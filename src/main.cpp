@@ -1,6 +1,6 @@
 #include <vector>
 #include <iostream>
-#include "PuzzleBoard.h"
+#include "models/PuzzleBoard.h"
 
 int main() {
     std::vector<int> state = {1, 2, 3, 4, 5, 6, 7, 8, 0};

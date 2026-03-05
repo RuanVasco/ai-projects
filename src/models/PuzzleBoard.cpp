@@ -1,4 +1,4 @@
-#include "PuzzleBoard.h"
+#include "models/PuzzleBoard.h"
 
 PuzzleBoard::PuzzleBoard(int size, const std::vector<int>& initial_state) {
     this->n = size;
