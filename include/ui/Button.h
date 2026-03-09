@@ -16,4 +16,6 @@ public:
 	bool is_clicked();
 	void draw() const;
 	void set_disabled(bool disabled);
+	bool get_is_hovered() const;
+	void update();
 };

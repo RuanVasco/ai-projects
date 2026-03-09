@@ -41,3 +41,16 @@ void Button::draw() const {
 void Button::set_disabled(bool disabled) {
     this->isDisabled = disabled;
 }
+
+bool Button::get_is_hovered() const {
+    return this->isHovered;
+}
+
+void Button::update() {
+    if (isDisabled) {
+        this->isHovered = false;
+        return;
+    }
+    Vector2 mousePoint = GetMousePosition();
+    this->isHovered = CheckCollisionPointRec(mousePoint, bounds);
+}
