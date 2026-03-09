@@ -23,6 +23,8 @@ add_executable(${PROJECT_NAME}
     "src/models/Solver.cpp"
     "include/ui/Button.h"
     "src/ui/Button.cpp"
+    "include/ui/Application.h"
+    "src/ui/Application.cpp"
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
