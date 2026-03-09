@@ -12,7 +12,10 @@ private:
 	bool isHovered;
 	bool isDisabled;
 public:
-	Button(float x, float y, float width, float height, const std::string& text);
+	Button(float x, float y, float width, float height, const std::string& text,
+		Color normalColor = DARKPURPLE,
+		Color hoverColor = PURPLE,
+		Color disabledColor = GRAY);
 	bool is_clicked();
 	void draw() const;
 	void set_disabled(bool disabled);

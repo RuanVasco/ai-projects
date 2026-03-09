@@ -15,6 +15,7 @@ int main() {
 
     InitWindow(screenWidth, screenHeight, "8 Puzzle Solver");
     SetTargetFPS(60);
+    SetExitKey(KEY_NULL);
 
     std::vector<int> initialState = { 1, 2, 3, 4, 0, 5, 7, 8, 6 };
     PuzzleBoard puzzle(3, initialState);
@@ -22,7 +23,7 @@ int main() {
 
     Button btnInput(25, 50, 200, 50, "Set Initial State");
     Button btnShuffle(25, 120, 200, 50, "Shuffle");
-    Button btnSolve(25, 190, 200, 50, "Solve");
+    Button btnSolve(25, 190, 200, 50, "Solve", GREEN);
 
     std::vector<PuzzleBoard> solutionPath;
     bool isAnimating = false;
@@ -48,6 +49,7 @@ int main() {
         else {
             SetMouseCursor(MOUSE_CURSOR_DEFAULT);
         }
+        
 
         if (isModalOpen) {
             int key = GetCharPressed();
@@ -79,6 +81,7 @@ int main() {
             }
         }
         else {
+
             if (btnInput.is_clicked() && !isAnimating && !isProcessing) {
                 isModalOpen = true;
                 inputText = "";

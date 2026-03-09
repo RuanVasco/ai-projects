@@ -1,11 +1,12 @@
 #include <ui/Button.h>
 
-Button::Button(float x, float y, float width, float height, const std::string& text) {
+Button::Button(float x, float y, float width, float height, const std::string& text,
+    Color normalColor, Color hoverColor, Color disabledColor) {
     this->bounds = { x, y, width, height };
     this->text = text;
-    this->normalColor = DARKPURPLE;
-    this->hoverColor = PURPLE;
-    this->disabledColor = GRAY;
+    this->normalColor = normalColor;
+    this->hoverColor = hoverColor;
+    this->disabledColor = disabledColor;
     this->isHovered = false;
     this->isDisabled = false;
 }
