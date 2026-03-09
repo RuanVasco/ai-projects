@@ -24,19 +24,28 @@ bool Button::is_clicked() {
 }
 
 void Button::draw() const {
-    Color currentColor;
-    if (isDisabled) {
-        currentColor = disabledColor;
-    }
-    else {
-        currentColor = isHovered ? hoverColor : normalColor;
-    }
-
+    Color currentColor = isDisabled ? disabledColor : (isHovered ? hoverColor : normalColor);
     DrawRectangleRec(bounds, currentColor);
 
-    int textWidth = MeasureText(text.c_str(), 30);
+    float maxWidth = bounds.width - 20;
+    std::string displayText = text;
+    int fontSize = 20;
+
+    if (MeasureText(displayText.c_str(), fontSize) > maxWidth) {
+        while (!displayText.empty() && (MeasureText((displayText + "...").c_str(), fontSize) > maxWidth)) {
+            displayText.pop_back(); 
+        }
+        displayText += "...";
+    }
+
+    int textWidth = MeasureText(displayText.c_str(), fontSize);
     Color textColor = isDisabled ? LIGHTGRAY : WHITE;
-    DrawText(text.c_str(), bounds.x + (bounds.width - textWidth) / 2, bounds.y + 10, 30, textColor);
+
+    DrawText(displayText.c_str(),
+        bounds.x + (bounds.width - textWidth) / 2,
+        bounds.y + (bounds.height - fontSize) / 2,
+        fontSize,
+        textColor);
 }
 
 void Button::set_disabled(bool disabled) {
