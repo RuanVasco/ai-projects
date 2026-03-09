@@ -41,7 +41,6 @@ std::vector<PuzzleBoard> Solver::solve_bfs(PuzzleBoard initial_board) {
     }
 
     this->last_tested_states = visited.size();
-    std::cout << ">>> Total states tested: " << this->last_tested_states << " <<<" << std::endl;
 
     if (!found) {
         return {};
