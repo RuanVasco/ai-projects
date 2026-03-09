@@ -19,6 +19,10 @@ FetchContent_MakeAvailable(raylib)
 add_executable(${PROJECT_NAME} 
     src/main.cpp
     src/models/PuzzleBoard.cpp
- "include/models/Solver.h" "src/models/Solver.cpp")
+    "include/models/Solver.h"
+    "src/models/Solver.cpp"
+    "include/ui/Button.h"
+    "src/ui/Button.cpp"
+)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
