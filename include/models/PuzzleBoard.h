@@ -18,7 +18,6 @@ public:
         return board;
     }
 
-    std::vector<PuzzleBoard> PuzzleBoard::get_neighbors() const;
-
-    bool PuzzleBoard::is_goal() const;
+    std::vector<PuzzleBoard> get_neighbors() const;
+    bool is_goal() const;
 };
