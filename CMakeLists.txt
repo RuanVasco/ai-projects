@@ -29,4 +29,14 @@ add_executable(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
 
+if(WIN32)
+    set_target_properties(${PROJECT_NAME} PROPERTIES 
+        WIN32_EXECUTABLE $<$<CONFIG:Release>:TRUE>
+    )
+    
+    target_link_options(${PROJECT_NAME} PRIVATE 
+        $<$<CONFIG:Release>:/SUBSYSTEM:WINDOWS;/ENTRY:mainCRTStartup>
+    )
+endif()
+
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
