@@ -28,6 +28,8 @@ int main() {
     bool isAnimating = false;
     int currentStep = 0;
     bool isProcessing = false;
+    bool isSolved = false;
+    int tested_states = 0;
     std::future<std::vector<PuzzleBoard>> futureSolution;
     int framesCounter = 0;
 
@@ -69,6 +71,7 @@ int main() {
                 }
                 puzzle = PuzzleBoard(3, newState);
                 isModalOpen = false;
+                isSolved = false;
             }
 
             if (IsKeyPressed(KEY_ESCAPE)) {
@@ -87,6 +90,7 @@ int main() {
                     int randomIndex = GetRandomValue(0, neighbors.size() - 1);
                     puzzle = neighbors[randomIndex];
                 }
+                isSolved = false;
             }
 
             if (btnSolve.is_clicked() && !isAnimating && !isProcessing) {
@@ -94,6 +98,7 @@ int main() {
                 btnShuffle.set_disabled(true);
                 btnSolve.set_disabled(true);
                 isProcessing = true;
+                isSolved = false;
 
                 futureSolution = std::async(std::launch::async, &Solver::solve_bfs, &solver, puzzle);
             }
@@ -103,6 +108,9 @@ int main() {
             if (futureSolution.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
                 solutionPath = futureSolution.get();
                 isProcessing = false;
+
+                tested_states = solver.get_tested_states();
+                isSolved = true;
 
                 if (!solutionPath.empty()) {
                     isAnimating = true;
@@ -142,8 +150,17 @@ int main() {
         btnShuffle.draw();
         btnSolve.draw();
 
+        if (isSolved) {
+            std::string statesText = "Tested States: " + std::to_string(tested_states);
+            DrawText(statesText.c_str(), 25, 260, 20, DARKGRAY);
+
+            if (solutionPath.empty()) {
+                DrawText("UNSOLVABLE", 25, 290, 20, RED);
+            }
+        }
+
         if (isProcessing) {
-            DrawText("Processing...", 65, 260, 20, DARKBLUE);
+            DrawText("Processing...", 25, 260, 20, DARKBLUE);
         }
 
         const std::vector<int>& state = puzzle.get_board();
