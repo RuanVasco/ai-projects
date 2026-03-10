@@ -295,8 +295,8 @@ void Application::renderFlags() {
         { rectBR.x + fw / 2.0f, rectBR.y + fh - 2 },
         { rectBR.x + 4,         rectBR.y + fh / 2.0f }
     };
-    DrawTriangle(diamond[0], diamond[1], diamond[3], { 255, 220, 0, 255 });
-    DrawTriangle(diamond[1], diamond[2], diamond[3], { 255, 220, 0, 255 });
+    DrawTriangle(diamond[0], diamond[3], diamond[1], { 255, 220, 0, 255 });
+    DrawTriangle(diamond[3], diamond[2], diamond[1], { 255, 220, 0, 255 });
     DrawCircle((int)(rectBR.x + fw / 2), (int)(rectBR.y + fh / 2), 7, { 0, 56, 168, 255 });
 
     DrawRectangleRec(rectUS, { 178, 34, 52, 255 });
