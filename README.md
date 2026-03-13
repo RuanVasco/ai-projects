@@ -44,13 +44,14 @@ Após o acionamento da função "Resolver", o sistema apresenta:
 Abaixo estão exemplos do software em funcionamento:
 
 * **Tela Inicial e Inserção de Dados:**
-  ![Inserção de Dados](link_para_imagem_1.png)
+  ![Inserção de Dados](./assets/main_screen.png)
+  ![Inserção de Dados](./assets/set_initial_state.png)
 
 * **Processamento e Animação da Solução:**
-  ![Animação](link_para_imagem_2.png)
+  ![Animação](./assets/solved.png)
 
 * **Árvore da Solução (Visualização do Caminho):**
-  ![Árvore da Solução](link_para_imagem_3.png)
+  ![Árvore da Solução](./assets/view_tree.png)
 
 ## 4. Metodologia de Implementação (Busca em Largura)
 
