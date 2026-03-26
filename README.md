@@ -1,6 +1,6 @@
-# Implementação do Algoritmo de Busca em Largura para o Problema do 8 Puzzle
+# Implementação do Algoritmo de Busca em Largura e A* para o Problema do 8 Puzzle
 
-Este repositório contém o código-fonte e a documentação referentes ao trabalho prático de implementação do algoritmo de Busca em Largura (Breadth-First Search - BFS) aplicado à resolução do problema do 8-Puzzle para a disciplina de Inteligência Artificial, ministrada pelo professor Andrws Vieira, do Instituto Federal de Ciência, Tecnologia e Educação do Rio Grande do Sul - Campus Ibirubá.
+Este repositório contém o código-fonte e a documentação referentes ao trabalho prático de implementação dos algoritmos de Busca em Largura (Breadth-First Search - BFS) e Busca Heurística (A*) aplicados à resolução do problema do 8-Puzzle para a disciplina de Inteligência Artificial, ministrada pelo professor Andrws Vieira, do Instituto Federal de Ciência, Tecnologia e Educação do Rio Grande do Sul - Campus Ibirubá.
 
 O problema do 8-Puzzle consiste em um quebra-cabeça deslizante, composto por uma grade 3x3 contendo 8 peças numeradas (de 1 a 8) e um espaço vazio, representado pelo dígito 0. O objetivo do algoritmo é calcular a sequência ótima de movimentos para transitar de um estado inicial arbitrário até o estado final (meta), minimizando o número de transições.
 
@@ -53,14 +53,29 @@ Abaixo estão exemplos do software em funcionamento:
 * **Árvore da Solução (Visualização do Caminho):**
   ![Árvore da Solução](./assets/view_tree.png)
 
-## 4. Metodologia de Implementação (Busca em Largura)
+## 4. Metodologia de Implementação (Busca em Largura e A*)
 
-A busca em largura (BFS) foi implementada de forma a garantir a completude e a otimalidade da solução. A arquitetura do solucionador (`Solver`) emprega as seguintes estruturas de dados da Standard Template Library (STL) do C++:
+O projeto suporta duas abordagens fundamentais em Inteligência Artificial para a resolução do problema: uma busca cega (BFS) e uma busca informada (A*).
 
-* **`std::queue<PuzzleBoard>` (Fila de Fronteira):** Gerencia os nós a serem expandidos. A propriedade FIFO (First-In, First-Out) da fila assegura que a exploração do espaço de estados ocorra estritamente nível por nível, garantindo a localização do caminho mais curto.
-* **`std::set<std::vector<int>>` (Conjunto de Explorados):** Armazena as configurações de tabuleiro já visitadas. Esta estrutura possui complexidade de busca logarítmica, prevenindo ciclos infinitos e reduzindo drasticamente o tempo de execução ao podar estados redundantes.
-* **`std::map<std::vector<int>, PuzzleBoard>` (Mapeamento de Ancestralidade):** Associa cada estado gerado ao seu respectivo nó pai. Uma vez alcançado o estado meta, este mapa é percorrido em ordem reversa (*backtracking*) para reconstruir o caminho exato de movimentos.
-* **Processamento Assíncrono (`std::async` / `std::future`):** O processamento do algoritmo ocorre em uma *thread* separada. Isso impede o bloqueio da *main thread* responsável pela renderização da interface gráfica (raylib), mantendo a aplicação responsiva mesmo durante a avaliação de milhares de estados combinatórios.
+### 4.1 Busca em Largura (BFS)
+A BFS foi implementada de forma a garantir a completude e a otimalidade da solução de forma exaustiva. 
+* **`std::queue<PuzzleBoard>`:** A propriedade FIFO assegura a exploração do espaço de estados estritamente nível por nível.
+* **`std::set<std::vector<int>>`:** Conjunto para armazenar tabuleiros visitados, prevenindo ciclos e otimizando a memória.
+
+### 4.2 Busca Heurística (A*)
+
+
+[Image of A* search algorithm flowchart]
+
+Para elevar a eficiência computacional e reduzir a quantidade de estados testados, foi incorporado o algoritmo **A***. Ele avalia os nós com base na função de custo $f(n) = g(n) + h(n)$, onde $g(n)$ é o custo real (número de movimentos) e $h(n)$ é a estimativa até a meta.
+
+* **Heurística (Distância de Manhattan):** A heurística escolhida foi a Distância de Manhattan. Ela calcula a soma das distâncias horizontais e verticais que cada peça está de sua posição final correta. Como ela é uma heurística *admissível* (nunca superestima o custo real), o A* continua garantindo a descoberta do caminho mais curto.
+* **Eficiência e Poda:**
+Foi utilizada uma `std::priority_queue` (Fila de Prioridade em formato Min-Heap) para ordenar os estados. Dessa forma, o algoritmo prioriza ramificações que se aproximam visual e matematicamente da solução. Isso reduz drasticamente os estados abertos em memória, resolvendo cenários complexos de forma substancialmente mais rápida que a BFS.
+
+### 4.3 Estruturas Comuns
+* **`std::map<std::vector<int>, PuzzleBoard>`:** Utilizado por ambos os algoritmos para mapear a ancestralidade e reconstruir o caminho de movimentos (*backtracking*).
+* **Processamento Assíncrono (`std::async`):** Os cálculos são realizados em threads secundárias para não bloquear a renderização gráfica (`raylib`).
 
 ## 5. Recursos Adicionais
 
