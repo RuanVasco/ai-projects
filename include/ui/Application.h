@@ -11,6 +11,7 @@ struct LangStrings {
     std::string modalPrompt, modalHint;
     std::string treeTitle, treeMoves, treeStatesTested;
     std::string nodeInitial, nodeGoal, nodeStep;
+    std::string algorithmLabel;
 };
 
 class Application {
@@ -26,8 +27,11 @@ private:
     Button btnInput;
     Button btnShuffle;
     Button btnSolve;
+    Button btnAlgorithm;
     Button btnShowTree;
     Button btnBack;
+
+    bool useAStar;
 
     std::vector<PuzzleBoard> solutionPath;
     std::future<std::vector<PuzzleBoard>> futureSolution;

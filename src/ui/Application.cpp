@@ -7,7 +7,8 @@ const LangStrings Application::LANG_PT = {
     "Estados Testados: ", "SEM SOLUCAO", "Passos: ", "Processando...",
     "Digite 9 digitos (0-8):", "ENTER confirma, ESC cancela",
     "Arvore da Solucao", "movimentos", "estados testados",
-    "Estado Inicial", "Estado Final (Meta)", "Passo"
+    "Estado Inicial", "Estado Final (Meta)", "Passo",
+    "Algoritmo"
 };
 
 const LangStrings Application::LANG_EN = {
@@ -15,7 +16,8 @@ const LangStrings Application::LANG_EN = {
     "Tested States: ", "UNSOLVABLE", "Steps: ", "Processing...",
     "Enter 9 unique digits (0-8):", "ENTER to confirm, ESC to cancel",
     "Solution Tree", "moves", "states tested",
-    "Initial State", "Final State (Goal)", "Step"
+    "Initial State", "Final State (Goal)", "Step",
+    "Algorithm"
 };
 
 Application::Application()
@@ -23,9 +25,11 @@ Application::Application()
     puzzle(3, { 1, 2, 3, 4, 0, 5, 7, 8, 6 }), solver(),
     btnInput(25, 50, 200, 50, "Set Initial State"),
     btnShuffle(25, 120, 200, 50, "Shuffle"),
-    btnSolve(25, 190, 200, 50, "Solve", DARKGREEN, GREEN, GRAY),
-    btnShowTree(25, 335, 200, 50, "View Tree", DARKBLUE, BLUE, GRAY),
+    btnAlgorithm(25, 190, 200, 28, "Algoritmo: BFS", DARKGRAY, GRAY, DARKGRAY),
+    btnSolve(25, 228, 200, 50, "Solve", DARKGREEN, GREEN, GRAY),
+    btnShowTree(25, 355, 200, 50, "View Tree", DARKBLUE, BLUE, GRAY),
     btnBack(screenWidth - 130, 10, 110, 40, "Back", DARKGRAY, GRAY, DARKGRAY),
+    useAStar(false),
     isAnimating(false), isProcessing(false), isSolved(false), isModalOpen(false),
     isTreeViewOpen(false), currentStep(0), framesCounter(0), testedStates(0),
     treeScrollOffset(0), currentLang(Language::PT), lang(LANG_PT) {
@@ -46,6 +50,7 @@ void Application::setLanguage(Language l) {
     btnInput.set_text(lang.btnInput);
     btnShuffle.set_text(lang.btnShuffle);
     btnSolve.set_text(lang.btnSolve);
+    btnAlgorithm.set_text(lang.algorithmLabel + ": " + (useAStar ? "A*" : "BFS"));
     btnShowTree.set_text(lang.btnShowTree);
     btnBack.set_text(lang.btnBack);
 }
@@ -89,10 +94,12 @@ void Application::handleEvents() {
     btnInput.update();
     btnShuffle.update();
     btnSolve.update();
+    btnAlgorithm.update();
     if (isSolved && !solutionPath.empty() && !isAnimating) btnShowTree.update();
 
     bool anyHovered = btnInput.get_is_hovered() || btnShuffle.get_is_hovered() ||
-                      btnSolve.get_is_hovered() || btnShowTree.get_is_hovered();
+                      btnSolve.get_is_hovered() || btnAlgorithm.get_is_hovered() ||
+                      btnShowTree.get_is_hovered();
     if (anyHovered && !isModalOpen) {
         SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
     }
@@ -118,13 +125,23 @@ void Application::handleEvents() {
             isSolved = false;
         }
 
+        if (btnAlgorithm.is_clicked() && !isAnimating && !isProcessing) {
+            useAStar = !useAStar;
+            btnAlgorithm.set_text(lang.algorithmLabel + ": " + (useAStar ? "A*" : "BFS"));
+        }
+
         if (btnSolve.is_clicked() && !isAnimating && !isProcessing) {
             btnInput.set_disabled(true);
             btnShuffle.set_disabled(true);
             btnSolve.set_disabled(true);
+            btnAlgorithm.set_disabled(true);
             isProcessing = true;
             isSolved = false;
-            futureSolution = std::async(std::launch::async, &Solver::solve_bfs, &solver, puzzle, PuzzleBoard(3, { 1, 2, 3, 4, 5, 6, 7, 8, 0 }));
+            if (useAStar) {
+                futureSolution = std::async(std::launch::async, &Solver::solve_astar, &solver, puzzle, PuzzleBoard(3, { 1, 2, 3, 4, 5, 6, 7, 8, 0 }));
+            } else {
+                futureSolution = std::async(std::launch::async, &Solver::solve_bfs, &solver, puzzle, PuzzleBoard(3, { 1, 2, 3, 4, 5, 6, 7, 8, 0 }));
+            }
         }
 
         if (isSolved && !solutionPath.empty() && !isAnimating && btnShowTree.is_clicked()) {
@@ -199,6 +216,7 @@ void Application::updateLogic() {
                 btnInput.set_disabled(false);
                 btnShuffle.set_disabled(false);
                 btnSolve.set_disabled(false);
+                btnAlgorithm.set_disabled(false);
             }
         }
     }
@@ -216,6 +234,7 @@ void Application::updateLogic() {
                 btnInput.set_disabled(false);
                 btnShuffle.set_disabled(false);
                 btnSolve.set_disabled(false);
+                btnAlgorithm.set_disabled(false);
             }
         }
     }
@@ -228,24 +247,25 @@ void Application::renderSidebar() {
 
     btnInput.draw();
     btnShuffle.draw();
+    btnAlgorithm.draw();
     btnSolve.draw();
 
     if (isSolved) {
-        DrawText(lang.testedStates.c_str(), 25, 258, 17, DARKGRAY);
-        DrawText(std::to_string(testedStates).c_str(), 25, 277, 20, DARKGRAY);
+        DrawText(lang.testedStates.c_str(), 25, 295, 17, DARKGRAY);
+        DrawText(std::to_string(testedStates).c_str(), 25, 313, 20, DARKGRAY);
 
         if (solutionPath.empty()) {
-            DrawText(lang.unsolvable.c_str(), 25, 305, 20, RED);
+            DrawText(lang.unsolvable.c_str(), 25, 337, 20, RED);
         }
         else if (!isAnimating) {
             std::string stepsText = lang.steps + std::to_string((int)solutionPath.size() - 1);
-            DrawText(stepsText.c_str(), 25, 305, 20, DARKGRAY);
+            DrawText(stepsText.c_str(), 25, 337, 20, DARKGRAY);
             btnShowTree.draw();
         }
     }
 
     if (isProcessing) {
-        DrawText(lang.processing.c_str(), 25, 260, 20, DARKBLUE);
+        DrawText(lang.processing.c_str(), 25, 295, 20, DARKBLUE);
     }
 
     renderFlags();

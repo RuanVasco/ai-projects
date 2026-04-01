@@ -131,7 +131,7 @@ std::vector<PuzzleBoard> Solver::solve_astar(PuzzleBoard initial_board, PuzzleBo
                 int h = calculate_manhattan_distance(neighbor);
                 pq.push({neighbor, tentative_g, h});
                 
-                parent_map.insert({neighbor.get_board(), current});
+                parent_map.insert_or_assign(neighbor.get_board(), current);
             }
         }
     }
