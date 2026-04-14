@@ -51,7 +51,7 @@ with col_hc:
             help="Limite de movimentos antes de forçar um reinício.",
         )
 
-    if st.button("▶ Executar", key="btn_hc", use_container_width=True, type="primary"):
+    if st.button("▶ Executar", key="btn_hc", width='stretch', type="primary"):
         with st.spinner("Executando Subida de Encosta..."):
             resultado = subida_encosta(
                 max_reinicios=hc_max_reinicios,
@@ -68,7 +68,7 @@ with col_hc:
             st.warning(f"Melhor: {8 - r['conflitos']} rainhas sem conflito")
 
         fig_tab = criar_figura_tabuleiro(r["solucao"], titulo="Tabuleiro — Subida de Encosta")
-        st.plotly_chart(fig_tab, use_container_width=True, key="tab_hc")
+        st.plotly_chart(fig_tab, width='stretch', key="tab_hc")
 
         m1, m2 = st.columns(2)
         m1.metric("Conflitos", r["conflitos"])
@@ -84,7 +84,7 @@ with col_hc:
                 color_discrete_sequence=["#636efa"],
             )
             fig_conv.update_layout(height=220, margin=dict(l=5, r=5, t=35, b=5), showlegend=False)
-            st.plotly_chart(fig_conv, use_container_width=True, key="conv_hc")
+            st.plotly_chart(fig_conv, width='stretch', key="conv_hc")
 
 with col_sa:
     st.subheader("Têmpera Simulada")
@@ -120,7 +120,7 @@ with col_sa:
             help="Limite máximo de iterações do algoritmo.",
         )
 
-    if st.button("▶ Executar", key="btn_sa", use_container_width=True, type="primary"):
+    if st.button("▶ Executar", key="btn_sa", width='stretch', type="primary"):
         with st.spinner("Executando Têmpera Simulada..."):
             resultado = tempera_simulada(
                 temp_inicial=sa_temp_inicial,
@@ -138,7 +138,7 @@ with col_sa:
             st.warning(f"Melhor: {8 - r['conflitos']} rainhas sem conflito")
 
         fig_tab = criar_figura_tabuleiro(r["solucao"], titulo="Tabuleiro — Têmpera Simulada")
-        st.plotly_chart(fig_tab, use_container_width=True, key="tab_sa")
+        st.plotly_chart(fig_tab, width='stretch', key="tab_sa")
 
         m1, m2 = st.columns(2)
         m1.metric("Conflitos", r["conflitos"])
@@ -164,7 +164,7 @@ with col_sa:
             )
             fig_conv.update_yaxes(title_text="Conflitos", secondary_y=False)
             fig_conv.update_yaxes(title_text="Temperatura", secondary_y=True)
-            st.plotly_chart(fig_conv, use_container_width=True, key="conv_sa")
+            st.plotly_chart(fig_conv, width='stretch', key="conv_sa")
 
 with col_ga:
     st.subheader("Algoritmo Genético")
@@ -210,7 +210,7 @@ with col_ga:
             help="Limite máximo de gerações evolutivas.",
         )
 
-    if st.button("▶ Executar", key="btn_ga", use_container_width=True, type="primary"):
+    if st.button("▶ Executar", key="btn_ga", width='stretch', type="primary"):
         with st.spinner("Executando Algoritmo Genético..."):
             resultado = algoritmo_genetico(
                 tamanho_populacao=ga_pop,
@@ -229,7 +229,7 @@ with col_ga:
             st.warning(f"Melhor: {8 - r['conflitos']} rainhas sem conflito")
 
         fig_tab = criar_figura_tabuleiro(r["solucao"], titulo="Tabuleiro — Algoritmo Genético")
-        st.plotly_chart(fig_tab, use_container_width=True, key="tab_ga")
+        st.plotly_chart(fig_tab, width='stretch', key="tab_ga")
 
         m1, m2 = st.columns(2)
         m1.metric("Conflitos", r["conflitos"])
@@ -257,7 +257,7 @@ with col_ga:
                 xaxis_title="Geração",
                 yaxis_title="Fitness",
             )
-            st.plotly_chart(fig_conv, use_container_width=True, key="conv_ga")
+            st.plotly_chart(fig_conv, width='stretch', key="conv_ga")
 
 st.divider()
 st.subheader("Comparação dos Algoritmos")
@@ -294,7 +294,7 @@ else:
             text_auto=".1f",
         )
         fig_tempo.update_layout(height=300, showlegend=False, margin=dict(l=5, r=5, t=45, b=5))
-        st.plotly_chart(fig_tempo, use_container_width=True, key="comp_tempo")
+        st.plotly_chart(fig_tempo, width='stretch', key="comp_tempo")
 
     with comp2:
         fig_qualidade = px.bar(
@@ -312,7 +312,7 @@ else:
             margin=dict(l=5, r=5, t=45, b=5),
             yaxis=dict(range=[0, 8]),
         )
-        st.plotly_chart(fig_qualidade, use_container_width=True, key="comp_qualidade")
+        st.plotly_chart(fig_qualidade, width='stretch', key="comp_qualidade")
 
     linhas = []
     for k in chaves:
@@ -328,7 +328,7 @@ else:
         })
 
     df = pd.DataFrame(linhas)
-    st.dataframe(df, use_container_width=True, hide_index=True)
+    st.dataframe(df, width='stretch', hide_index=True)
 
     if st.button("Limpar Resultados", key="btn_limpar"):
         st.session_state["resultados"] = {}
