@@ -1,7 +1,5 @@
 import streamlit as st
 import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 import pandas as pd
 
 from src.board import criar_figura_tabuleiro
@@ -21,14 +19,14 @@ if "resultados" not in st.session_state:
 st.title("♛ Problema das 8 Rainhas")
 st.caption(
     "Comparação entre **Subida de Encosta**, **Têmpera Simulada** e **Algoritmo Genético**. "
-    "Configure os parâmetros de cada algoritmo, execute e compare os resultados."
+    "Configure os parâmetros, selecione os algoritmos e execute."
 )
 st.divider()
 
 col_hc, col_sa, col_ga = st.columns(3)
 
 with col_hc:
-    st.subheader("Subida de Encosta")
+    executar_hc = st.checkbox("**Subida de Encosta**", value=True, key="chk_hc")
     st.caption("Com Reinício Aleatório")
 
     with st.expander("Parâmetros", expanded=True):
@@ -51,43 +49,8 @@ with col_hc:
             help="Limite de movimentos antes de forçar um reinício.",
         )
 
-    if st.button("▶ Executar", key="btn_hc", width='stretch', type="primary"):
-        with st.spinner("Executando Subida de Encosta..."):
-            resultado = subida_encosta(
-                max_reinicios=hc_max_reinicios,
-                max_passos_por_reinicio=hc_max_passos,
-            )
-            st.session_state["resultados"]["hc"] = resultado
-
-    if "hc" in st.session_state["resultados"]:
-        r = st.session_state["resultados"]["hc"]
-
-        if r["sucesso"]:
-            st.success("Solução encontrada!")
-        else:
-            st.warning(f"Melhor: {8 - r['conflitos']} rainhas sem conflito")
-
-        fig_tab = criar_figura_tabuleiro(r["solucao"], titulo="Tabuleiro — Subida de Encosta")
-        st.plotly_chart(fig_tab, width='stretch', key="tab_hc")
-
-        m1, m2 = st.columns(2)
-        m1.metric("Conflitos", r["conflitos"])
-        m2.metric("Tempo (ms)", f"{r['tempo_ms']:.1f}")
-        m1.metric("Reinícios", r["reinicios"])
-        m2.metric("Iterações", r["iteracoes"])
-
-        if r["historico_conflitos"]:
-            fig_conv = px.line(
-                y=r["historico_conflitos"],
-                labels={"index": "Iteração", "y": "Conflitos"},
-                title="Convergência",
-                color_discrete_sequence=["#636efa"],
-            )
-            fig_conv.update_layout(height=220, margin=dict(l=5, r=5, t=35, b=5), showlegend=False)
-            st.plotly_chart(fig_conv, width='stretch', key="conv_hc")
-
 with col_sa:
-    st.subheader("Têmpera Simulada")
+    executar_sa = st.checkbox("**Têmpera Simulada**", value=True, key="chk_sa")
     st.caption("Simulated Annealing")
 
     with st.expander("Parâmetros", expanded=True):
@@ -120,54 +83,8 @@ with col_sa:
             help="Limite máximo de iterações do algoritmo.",
         )
 
-    if st.button("▶ Executar", key="btn_sa", width='stretch', type="primary"):
-        with st.spinner("Executando Têmpera Simulada..."):
-            resultado = tempera_simulada(
-                temp_inicial=sa_temp_inicial,
-                taxa_resfriamento=sa_taxa_resfriamento,
-                max_iteracoes=sa_max_iter,
-            )
-            st.session_state["resultados"]["sa"] = resultado
-
-    if "sa" in st.session_state["resultados"]:
-        r = st.session_state["resultados"]["sa"]
-
-        if r["sucesso"]:
-            st.success("Solução encontrada!")
-        else:
-            st.warning(f"Melhor: {8 - r['conflitos']} rainhas sem conflito")
-
-        fig_tab = criar_figura_tabuleiro(r["solucao"], titulo="Tabuleiro — Têmpera Simulada")
-        st.plotly_chart(fig_tab, width='stretch', key="tab_sa")
-
-        m1, m2 = st.columns(2)
-        m1.metric("Conflitos", r["conflitos"])
-        m2.metric("Tempo (ms)", f"{r['tempo_ms']:.1f}")
-        m1.metric("Iterações", r["iteracoes"])
-        m2.metric("Temp. Final", f"{r['temperatura_final']:.4f}")
-
-        if r["historico_conflitos"] and r["historico_temperatura"]:
-            fig_conv = make_subplots(specs=[[{"secondary_y": True}]])
-            fig_conv.add_trace(
-                go.Scatter(y=r["historico_conflitos"], name="Conflitos", line=dict(color="#ef553b")),
-                secondary_y=False,
-            )
-            fig_conv.add_trace(
-                go.Scatter(y=r["historico_temperatura"], name="Temperatura", line=dict(color="#636efa", dash="dot")),
-                secondary_y=True,
-            )
-            fig_conv.update_layout(
-                title="Convergência",
-                height=220,
-                margin=dict(l=5, r=5, t=35, b=5),
-                legend=dict(orientation="h", y=-0.2),
-            )
-            fig_conv.update_yaxes(title_text="Conflitos", secondary_y=False)
-            fig_conv.update_yaxes(title_text="Temperatura", secondary_y=True)
-            st.plotly_chart(fig_conv, width='stretch', key="conv_sa")
-
 with col_ga:
-    st.subheader("Algoritmo Genético")
+    executar_ga = st.checkbox("**Algoritmo Genético**", value=True, key="chk_ga")
     st.caption("Genetic Algorithm")
 
     with st.expander("Parâmetros", expanded=True):
@@ -210,7 +127,41 @@ with col_ga:
             help="Limite máximo de gerações evolutivas.",
         )
 
-    if st.button("▶ Executar", key="btn_ga", width='stretch', type="primary"):
+algos_selecionados = executar_hc or executar_sa or executar_ga
+
+col_btn, col_clear = st.columns([3, 1])
+with col_btn:
+    executar = st.button(
+        "▶ Executar Algoritmos Selecionados",
+        key="btn_executar",
+        type="primary",
+        disabled=not algos_selecionados,
+        use_container_width=True,
+    )
+with col_clear:
+    if st.button("Limpar Resultados", key="btn_limpar", use_container_width=True):
+        st.session_state["resultados"] = {}
+        st.rerun()
+
+if executar:
+    if executar_hc:
+        with st.spinner("Executando Subida de Encosta..."):
+            resultado = subida_encosta(
+                max_reinicios=hc_max_reinicios,
+                max_passos_por_reinicio=hc_max_passos,
+            )
+            st.session_state["resultados"]["hc"] = resultado
+
+    if executar_sa:
+        with st.spinner("Executando Têmpera Simulada..."):
+            resultado = tempera_simulada(
+                temp_inicial=sa_temp_inicial,
+                taxa_resfriamento=sa_taxa_resfriamento,
+                max_iteracoes=sa_max_iter,
+            )
+            st.session_state["resultados"]["sa"] = resultado
+
+    if executar_ga:
         with st.spinner("Executando Algoritmo Genético..."):
             resultado = algoritmo_genetico(
                 tamanho_populacao=ga_pop,
@@ -220,49 +171,49 @@ with col_ga:
             )
             st.session_state["resultados"]["ga"] = resultado
 
-    if "ga" in st.session_state["resultados"]:
-        r = st.session_state["resultados"]["ga"]
+st.divider()
 
-        if r["sucesso"]:
-            st.success("Solução encontrada!")
-        else:
-            st.warning(f"Melhor: {8 - r['conflitos']} rainhas sem conflito")
+resultados = st.session_state["resultados"]
 
-        fig_tab = criar_figura_tabuleiro(r["solucao"], titulo="Tabuleiro — Algoritmo Genético")
-        st.plotly_chart(fig_tab, width='stretch', key="tab_ga")
+if resultados:
+    col_hc_r, col_sa_r, col_ga_r = st.columns(3)
+    cols_resultado = {"hc": col_hc_r, "sa": col_sa_r, "ga": col_ga_r}
+    titulos = {
+        "hc": "Subida de Encosta",
+        "sa": "Têmpera Simulada",
+        "ga": "Algoritmo Genético",
+    }
 
-        m1, m2 = st.columns(2)
-        m1.metric("Conflitos", r["conflitos"])
-        m2.metric("Tempo (ms)", f"{r['tempo_ms']:.1f}")
-        m1.metric("Gerações", r["geracoes"])
-        m2.metric("Fitness Final", 28 - r["conflitos"])
+    for chave, col in cols_resultado.items():
+        if chave not in resultados:
+            continue
+        r = resultados[chave]
+        with col:
+            with st.container(border=True):
+                st.subheader(titulos[chave])
+                if r["sucesso"]:
+                    st.success("Solução encontrada!")
+                else:
+                    st.warning(f"Melhor: {8 - r['conflitos']} rainhas sem conflito")
 
-        if r["historico_melhor_fitness"]:
-            fig_conv = go.Figure()
-            fig_conv.add_trace(go.Scatter(
-                y=r["historico_melhor_fitness"],
-                name="Melhor Fitness",
-                line=dict(color="#00cc96"),
-            ))
-            fig_conv.add_trace(go.Scatter(
-                y=r["historico_media_fitness"],
-                name="Média Fitness",
-                line=dict(color="#ab63fa", dash="dot"),
-            ))
-            fig_conv.update_layout(
-                title="Evolução do Fitness",
-                height=220,
-                margin=dict(l=5, r=5, t=35, b=5),
-                legend=dict(orientation="h", y=-0.2),
-                xaxis_title="Geração",
-                yaxis_title="Fitness",
-            )
-            st.plotly_chart(fig_conv, width='stretch', key="conv_ga")
+                fig_tab = criar_figura_tabuleiro(r["solucao"], titulo=f"Tabuleiro — {titulos[chave]}")
+                st.plotly_chart(fig_tab, width='stretch', key=f"tab_{chave}")
+
+                m1, m2 = st.columns(2)
+                m1.metric("Conflitos", r["conflitos"])
+                m2.metric("Tempo (ms)", f"{r['tempo_ms']:.1f}")
+                if chave == "hc":
+                    m1.metric("Reinícios", r["reinicios"])
+                    m2.metric("Iterações", r["iteracoes"])
+                elif chave == "sa":
+                    m1.metric("Iterações", r["iteracoes"])
+                    m2.metric("Temp. Final", f"{r['temperatura_final']:.4f}")
+                elif chave == "ga":
+                    m1.metric("Gerações", r["geracoes"])
+                    m2.metric("Fitness Final", 28 - r["conflitos"])
 
 st.divider()
 st.subheader("Comparação dos Algoritmos")
-
-resultados = st.session_state["resultados"]
 
 if len(resultados) < 2:
     algoritmos_faltando = 2 - len(resultados)
@@ -281,7 +232,7 @@ else:
     nomes_exibidos = [nomes[k] for k in chaves]
     dados = [resultados[k] for k in chaves]
 
-    comp1, comp2 = st.columns(2)
+    comp1, comp2, comp3 = st.columns(3)
 
     with comp1:
         fig_tempo = px.bar(
@@ -297,11 +248,29 @@ else:
         st.plotly_chart(fig_tempo, width='stretch', key="comp_tempo")
 
     with comp2:
+        iters = []
+        for k in chaves:
+            r = resultados[k]
+            iters.append(r.get("iteracoes") or r.get("geracoes") or 0)
+
+        fig_iter = px.bar(
+            x=nomes_exibidos,
+            y=iters,
+            labels={"x": "Algoritmo", "y": "Iterações / Reinícios"},
+            title="Iterações ou Reinícios",
+            color=nomes_exibidos,
+            color_discrete_sequence=px.colors.qualitative.Plotly,
+            text_auto=True,
+        )
+        fig_iter.update_layout(height=300, showlegend=False, margin=dict(l=5, r=5, t=45, b=5))
+        st.plotly_chart(fig_iter, width='stretch', key="comp_iter")
+
+    with comp3:
         fig_qualidade = px.bar(
             x=nomes_exibidos,
             y=[8 - r["conflitos"] for r in dados],
             labels={"x": "Algoritmo", "y": "Rainhas Sem Conflito"},
-            title="Qualidade da Solução (rainhas sem conflito)",
+            title="Qualidade da Solução",
             color=nomes_exibidos,
             color_discrete_sequence=px.colors.qualitative.Plotly,
             text_auto=True,
@@ -317,19 +286,17 @@ else:
     linhas = []
     for k in chaves:
         r = resultados[k]
-        iters = r.get("iteracoes") or r.get("geracoes") or "—"
+        iters_val = r.get("iteracoes") or r.get("geracoes") or "—"
+        reinicios_val = r.get("reinicios", "—")
         linhas.append({
             "Algoritmo": nomes[k],
-            "Conflitos": r["conflitos"],
-            "Rainhas OK": 8 - r["conflitos"],
             "Sucesso": "Sim" if r["sucesso"] else "Não",
             "Tempo (ms)": round(r["tempo_ms"], 2),
-            "Iterações / Gerações": iters,
+            "Iterações / Gerações": iters_val,
+            "Reinícios": reinicios_val,
+            "Rainhas sem conflito": 8 - r["conflitos"],
+            "Conflitos": r["conflitos"],
         })
 
     df = pd.DataFrame(linhas)
     st.dataframe(df, width='stretch', hide_index=True)
-
-    if st.button("Limpar Resultados", key="btn_limpar"):
-        st.session_state["resultados"] = {}
-        st.rerun()
