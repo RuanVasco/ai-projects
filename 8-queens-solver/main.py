@@ -286,8 +286,8 @@ else:
     linhas = []
     for k in chaves:
         r = resultados[k]
-        iters_val = r.get("iteracoes") or r.get("geracoes") or "—"
-        reinicios_val = r.get("reinicios", "—")
+        iters_val = r.get("iteracoes") or r.get("geracoes") or None
+        reinicios_val = r.get("reinicios", None)
         linhas.append({
             "Algoritmo": nomes[k],
             "Sucesso": "Sim" if r["sucesso"] else "Não",
