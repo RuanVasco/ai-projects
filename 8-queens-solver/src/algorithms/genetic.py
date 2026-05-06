@@ -19,7 +19,7 @@ def _selecao_torneio(populacao: list[list[int]], k: int = 3) -> list[int]:
 
 
 def _cruzamento(pai1: list[int], pai2: list[int]) -> tuple[list[int], list[int]]:
-    ponto_corte = random.randint(1, 7)
+    ponto_corte = random.randint(1, 7) # transformar em parâmetro
     filho1 = pai1[:ponto_corte] + pai2[ponto_corte:]
     filho2 = pai2[:ponto_corte] + pai1[ponto_corte:]
     return filho1, filho2
