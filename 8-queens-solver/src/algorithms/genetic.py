@@ -18,20 +18,20 @@ def _selecao_torneio(populacao: list[list[int]], k: int = 3) -> list[int]:
     return max(participantes, key=_fitness)
 
 
-def _cruzamento(pai1: list[int], pai2: list[int]) -> tuple[list[int], list[int]]:
-    ponto_corte = random.randint(1, 7) # transformar em parâmetro
+def _cruzamento(pai1: list[int], pai2: list[int], ponto_corte: int | None = None) -> tuple[list[int], list[int]]:
+    if ponto_corte is None:
+        ponto_corte = random.randint(1, 7)
     filho1 = pai1[:ponto_corte] + pai2[ponto_corte:]
     filho2 = pai2[:ponto_corte] + pai1[ponto_corte:]
     return filho1, filho2
 
 
 def _mutacao(individuo: list[int], taxa: float) -> list[int]:
+    if random.random() >= taxa:
+        return individuo[:]
     mutado = individuo[:]
-    for i in range(8):
-        if random.random() < taxa:
-            valor_atual = mutado[i]
-            nova_linha = random.choice([r for r in range(8) if r != valor_atual])
-            mutado[i] = nova_linha
+    i = random.randrange(8)
+    mutado[i] = random.choice([r for r in range(8) if r != mutado[i]])
     return mutado
 
 
@@ -41,6 +41,7 @@ def algoritmo_genetico(
     taxa_cruzamento: float = 0.9,
     max_geracoes: int = 1000,
     n_elites: int = 2,
+    ponto_corte: int | None = None,
     semente: int | None = None,
 ) -> dict:
     if semente is not None:
@@ -82,7 +83,7 @@ def algoritmo_genetico(
             pai2 = _selecao_torneio(populacao)
 
             if random.random() < taxa_cruzamento:
-                filho1, filho2 = _cruzamento(pai1, pai2)
+                filho1, filho2 = _cruzamento(pai1, pai2, ponto_corte)
             else:
                 filho1, filho2 = pai1[:], pai2[:]
 
